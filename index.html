@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaceLog Attendance System</title>
+    <style>
+        /* Basic Styling */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            font-family: 'Poppins', sans-serif;
+            color: #eaeaea;
+            background: url("https://images.unsplash.com/photo-1613375920388-f1f70f341f8a?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8Ymx1ZSUyMHRleHR1cmV8ZW58MHx8MHx8fDA%3D") no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        header {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            border-radius: 100px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin: 0 15px;
+        }
+
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .main-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: calc(100vh - 150px);
+            padding: 0 50px;
+        }
+
+        /* Attendance Summary - Left Side */
+        .summary-box {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            width: 220px;
+            color: #fff;
+            box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .summary-box h2 {
+            text-align: center;
+            font-size: 18px;
+            background: linear-gradient(45deg, #00c6ff, #0072ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Live Attendance Feed - Right Side */
+        .camera-feed {
+            width: 900px;
+            height: 550px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 22px;
+            padding: 15px;
+            text-align: center;
+            color: white;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .camera-feed img {
+            width: 100%;
+            height: 80%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        /* Footer */
+        footer {
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>FaceLog Attendance System</h1>
+        <nav>
+            <ul>
+                <li><a href="/">🏠 Home</a></li>
+                
+
+                <!-- Password-Protected Download CSV Link -->
+                <li>
+                    <a href="#" id="downloadLink">📥 Download CSV</a>
+                </li>
+
+                <li><button id="themeToggle">🌙 Toggle Theme</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="main-container">
+        <!-- Attendance Summary Box on Left Side -->
+        <div class="summary-box">
+            <h2>📊 Attendance Summary</h2>
+            <p>Total: <span id="totalStudents">0</span></p>
+            <p>Present: <span id="presentCount">0</span></p>
+            <p>Absent: <span id="absentCount">0</span></p>
+            <p>Percentage: <span id="attendancePercentage">0%</span></p>
+        </div>
+
+        <!-- Live Attendance Feed (Right Side) -->
+        <div class="camera-feed">
+            <h2>📷 Live Attendance Feed</h2>
+            <p>FaceLog uses advanced facial recognition for quick, secure tracking.</p>
+            <img id="video-feed" src="/video_feed" alt="Live Video Feed">
+        </div>
+    </div>
+
+
+    <script>
+        // Handle password prompt for CSV download
+        document.getElementById("downloadLink").addEventListener("click", function(event) {
+            event.preventDefault();
+            const password = prompt("Please enter the password to download the CSV:");
+            if (!password) return;
+            window.location.href = "/download_csv?pwd=" + encodeURIComponent(password);
+        });
+
+        // Update Attendance Stats
+        document.addEventListener("DOMContentLoaded", function() {
+            function updateAttendance() {
+                fetch('/extended_attendance')
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('totalStudents').innerText = data.total_students;
+                        document.getElementById('presentCount').innerText = data.present;
+                        document.getElementById('absentCount').innerText = data.absent;
+                        document.getElementById('attendancePercentage').innerText = data.percentage.toFixed(2) + '%';
+                    })
+                    .catch(error => console.error('Error fetching attendance data:', error));
+            }
+
+            setInterval(updateAttendance, 5000);
+            updateAttendance();
+        });
+    </script>
+
+</body>
+</html>
